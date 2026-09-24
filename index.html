@@ -7,7 +7,8 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
 <style>
   :root{
-    --bg:#f3f1ec;
+    /* 라이트 모드 기본값 (화이트 스와치) */
+    --bg:#f6f4f0;
     --surface:#ffffff;
     --surface-muted:#f8f6f2;
     --border:#e4e0d7;
@@ -19,19 +20,21 @@
     --sun:#b5563f;
     --sat:#3d6a94;
 
-    --shift-day:#c4523f;
-    --shift-night:#c98a34;
-    --shift-off:#4c8c6b;
-    --shift-rest:#4569a8;
-    --shift-day-fg:#fff6f3;
-    --shift-night-fg:#fff8ee;
-    --shift-off-fg:#f2fbf6;
-    --shift-rest-fg:#f2f6fc;
+    /* 라이트 모드 파스텔 근무 색상 (스와치와 무관하게 공통 적용) */
+    --shift-day:#f3c9bd;
+    --shift-night:#f6dcae;
+    --shift-off:#c9e8d3;
+    --shift-rest:#cddaf3;
+    --shift-day-fg:#7a3423;
+    --shift-night-fg:#7a5a17;
+    --shift-off-fg:#2f6b47;
+    --shift-rest-fg:#33518c;
 
     color-scheme: light;
   }
+  /* JS가 붙기 전 첫 페인트에서 시스템이 다크면 잠깐이라도 다크로 보이게 하는 안전망 */
   @media (prefers-color-scheme: dark){
-    :root:not([data-theme="light"]){
+    :root:not([data-app-theme]){
       --bg:#15161a;
       --surface:#1c1e24;
       --surface-muted:#20222a;
@@ -55,7 +58,7 @@
       color-scheme: dark;
     }
   }
-  :root[data-theme="dark"]{
+  :root[data-app-theme="dark"]{
     --bg:#15161a;
     --surface:#1c1e24;
     --surface-muted:#20222a;
@@ -79,6 +82,26 @@
     color-scheme: dark;
   }
 
+  /* 라이트 모드 파스텔 배경 스와치 — 근무 색상은 공통, 배경/카드/테두리만 색상별로 달라짐 */
+  :root[data-app-theme="light"][data-swatch="lavender"]{
+    --bg:#ece3f8; --surface:#f8f4fc; --surface-muted:#f1e9f8; --border:#ddd0ef; --accent-soft:#e4d8f5;
+  }
+  :root[data-app-theme="light"][data-swatch="mint"]{
+    --bg:#dff3e6; --surface:#f2faf5; --surface-muted:#e7f6ec; --border:#c9e8d4; --accent-soft:#cdeed9;
+  }
+  :root[data-app-theme="light"][data-swatch="peach"]{
+    --bg:#fbe8db; --surface:#fdf5ef; --surface-muted:#faeee1; --border:#f3d3bb; --accent-soft:#f7dcc4;
+  }
+  :root[data-app-theme="light"][data-swatch="sky"]{
+    --bg:#ddedf9; --surface:#f1f8fd; --surface-muted:#e7f3fb; --border:#c7dff2; --accent-soft:#d2e7f7;
+  }
+  :root[data-app-theme="light"][data-swatch="rose"]{
+    --bg:#fbe2e8; --surface:#fdf2f4; --surface-muted:#fae8eb; --border:#f4c9d3; --accent-soft:#f8d5dd;
+  }
+  :root[data-app-theme="light"][data-swatch="butter"]{
+    --bg:#faf3d9; --surface:#fdfaec; --surface-muted:#f8f1d6; --border:#f0e3ad; --accent-soft:#f5eec0;
+  }
+
   *{box-sizing:border-box;}
   [hidden]{ display:none !important; }
   html,body{ margin:0; }
@@ -91,6 +114,7 @@
     max-width:480px;
     margin:0 auto;
     -webkit-tap-highlight-color:transparent;
+    transition:background-color .15s ease;
   }
   h1,h2{text-wrap:balance; margin:0;}
 
@@ -299,6 +323,8 @@
   .settings-panel{
     width:100%;
     max-width:480px;
+    max-height:88vh;
+    overflow-y:auto;
     background:var(--surface);
     border-top-left-radius:20px;
     border-top-right-radius:20px;
@@ -338,6 +364,27 @@
     background:var(--surface-muted);
     color:var(--text);
   }
+  .divider{
+    border:none;
+    border-top:1px solid var(--border);
+    margin:2px 0;
+  }
+  .swatch-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .swatch-btn{
+    width:30px;height:30px;
+    border-radius:50%;
+    border:2px solid var(--border);
+    padding:0;
+    cursor:pointer;
+  }
+  .swatch-btn.active{
+    border-color:var(--accent);
+    box-shadow:0 0 0 2px var(--accent-soft);
+  }
   .settings-actions{
     display:flex;
     gap:8px;
@@ -369,7 +416,7 @@
   <button class="icon-btn" id="prevMonth" aria-label="이전 달">‹</button>
   <div class="month-title" id="monthTitle">-</div>
   <button class="icon-btn" id="nextMonth" aria-label="다음 달">›</button>
-  <button class="icon-btn" id="settingsBtn" aria-label="기준일 설정">⚙</button>
+  <button class="icon-btn" id="settingsBtn" aria-label="설정">⚙</button>
 </div>
 
 <div class="control-row">
@@ -400,6 +447,22 @@
 
 <div class="settings-overlay" id="settingsOverlay" hidden>
   <div class="settings-panel">
+    <h2>화면 테마</h2>
+    <label class="field">
+      <span>테마 모드</span>
+      <div class="team-select" id="themeModeSelect">
+        <button data-mode="system">시스템</button>
+        <button data-mode="light">라이트</button>
+        <button data-mode="dark">다크</button>
+      </div>
+    </label>
+    <div class="field" id="swatchField">
+      <span>배경 색상 (라이트 모드 전용)</span>
+      <div class="swatch-row" id="swatchRow"></div>
+    </div>
+
+    <hr class="divider">
+
     <h2>기준일 설정</h2>
     <p class="settings-desc">4조 2교대는 조마다 하루씩 밀려서 "주간 → 야간 → 비번 → 휴무"가 반복돼요. 기준 날짜에 한 조가 무슨 근무였는지 입력하면 전체 달력이 자동으로 계산돼요.</p>
     <label class="field">
@@ -440,6 +503,16 @@
     {key:'off',   label:'비번', cls:'shift-off'},
     {key:'rest',  label:'휴무', cls:'shift-rest'}
   ];
+  var THEME_MODES = ['system','light','dark'];
+  var SWATCHES = [
+    {key:'white',    label:'화이트', hex:'#f6f4f0'},
+    {key:'lavender', label:'라벤더', hex:'#ece3f8'},
+    {key:'mint',     label:'민트',   hex:'#dff3e6'},
+    {key:'peach',    label:'피치',   hex:'#fbe8db'},
+    {key:'sky',      label:'스카이', hex:'#ddedf9'},
+    {key:'rose',     label:'로즈',   hex:'#fbe2e8'},
+    {key:'butter',   label:'버터',   hex:'#faf3d9'}
+  ];
 
   function pad(n){ return String(n).padStart(2,'0'); }
   function mod4(n){ return ((n % 4) + 4) % 4; }
@@ -462,7 +535,9 @@
     anchorTeam: 'B',
     anchorShiftIndex: 0,
     viewYear: 2026,
-    viewMonth: 8
+    viewMonth: 8,
+    themeMode: 'system',
+    swatch: 'lavender'
   };
 
   function loadState(){
@@ -479,6 +554,8 @@
       if(saved && Number.isInteger(saved.anchorShiftIndex) && saved.anchorShiftIndex>=0 && saved.anchorShiftIndex<4){
         state.anchorShiftIndex = saved.anchorShiftIndex;
       }
+      if(saved && THEME_MODES.indexOf(saved.themeMode) !== -1) state.themeMode = saved.themeMode;
+      if(saved && SWATCHES.some(function(s){ return s.key === saved.swatch; })) state.swatch = saved.swatch;
     }catch(e){}
   }
   function saveState(){
@@ -487,7 +564,9 @@
         myTeam: state.myTeam,
         anchorDate: dateKey(state.anchorDate),
         anchorTeam: state.anchorTeam,
-        anchorShiftIndex: state.anchorShiftIndex
+        anchorShiftIndex: state.anchorShiftIndex,
+        themeMode: state.themeMode,
+        swatch: state.swatch
       }));
     }catch(e){}
   }
@@ -504,11 +583,53 @@
   var monthTitleEl = document.getElementById('monthTitle');
   var gridEl = document.getElementById('calendarGrid');
   var teamSelectEl = document.getElementById('teamSelect');
+  var themeModeSelectEl = document.getElementById('themeModeSelect');
+  var swatchRowEl = document.getElementById('swatchRow');
+  var swatchFieldEl = document.getElementById('swatchField');
+
+  SWATCHES.forEach(function(s){
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'swatch-btn';
+    btn.dataset.swatch = s.key;
+    btn.style.background = s.hex;
+    btn.setAttribute('aria-label', s.label);
+    btn.title = s.label;
+    swatchRowEl.appendChild(btn);
+  });
 
   function renderTeamButtons(){
     Array.prototype.forEach.call(teamSelectEl.children, function(btn){
       btn.classList.toggle('active', btn.dataset.team === state.myTeam);
     });
+  }
+
+  var darkModeQuery = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)')) || null;
+
+  function effectiveTheme(){
+    if(state.themeMode === 'dark') return 'dark';
+    if(state.themeMode === 'light') return 'light';
+    return (darkModeQuery && darkModeQuery.matches) ? 'dark' : 'light';
+  }
+
+  function applyTheme(){
+    var eff = effectiveTheme();
+    document.documentElement.setAttribute('data-app-theme', eff);
+    document.documentElement.setAttribute('data-swatch', state.swatch);
+
+    Array.prototype.forEach.call(themeModeSelectEl.children, function(btn){
+      btn.classList.toggle('active', btn.dataset.mode === state.themeMode);
+    });
+    Array.prototype.forEach.call(swatchRowEl.children, function(btn){
+      btn.classList.toggle('active', btn.dataset.swatch === state.swatch);
+    });
+    swatchFieldEl.hidden = eff !== 'light';
+  }
+
+  if(darkModeQuery){
+    var onSchemeChange = function(){ if(state.themeMode === 'system') applyTheme(); };
+    if(darkModeQuery.addEventListener) darkModeQuery.addEventListener('change', onSchemeChange);
+    else if(darkModeQuery.addListener) darkModeQuery.addListener(onSchemeChange);
   }
 
   function renderCalendar(){
@@ -554,6 +675,7 @@
   function renderAll(){
     renderTeamButtons();
     renderCalendar();
+    applyTheme();
   }
 
   document.getElementById('prevMonth').addEventListener('click', function(){
@@ -577,6 +699,20 @@
     state.myTeam = btn.dataset.team;
     saveState();
     renderAll();
+  });
+  themeModeSelectEl.addEventListener('click', function(e){
+    var btn = e.target.closest('button[data-mode]');
+    if(!btn) return;
+    state.themeMode = btn.dataset.mode;
+    saveState();
+    applyTheme();
+  });
+  swatchRowEl.addEventListener('click', function(e){
+    var btn = e.target.closest('button[data-swatch]');
+    if(!btn) return;
+    state.swatch = btn.dataset.swatch;
+    saveState();
+    applyTheme();
   });
 
   var overlay = document.getElementById('settingsOverlay');
