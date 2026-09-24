@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>4조 2교대 달력</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+  :root{
+    --bg:#f3f1ec;
+    --surface:#ffffff;
+    --surface-muted:#f8f6f2;
+    --border:#e4e0d7;
+    --text:#211f1b;
+    --text-muted:#847e72;
+    --text-faint:#b7b0a2;
+    --accent:#3d5a80;
+    --accent-soft:#dbe4ee;
+    --sun:#b5563f;
+    --sat:#3d6a94;
+
+    --shift-day:#c4523f;
+    --shift-night:#c98a34;
+    --shift-off:#4c8c6b;
+    --shift-rest:#4569a8;
+    --shift-day-fg:#fff6f3;
+    --shift-night-fg:#fff8ee;
+    --shift-off-fg:#f2fbf6;
+    --shift-rest-fg:#f2f6fc;
+
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#15161a;
+      --surface:#1c1e24;
+      --surface-muted:#20222a;
+      --border:#2d3038;
+      --text:#edeef2;
+      --text-muted:#93909f;
+      --text-faint:#585864;
+      --accent:#8db0dc;
+      --accent-soft:#28374a;
+      --sun:#e08669;
+      --sat:#7aa8d6;
+
+      --shift-day:#d97862;
+      --shift-night:#dba24f;
+      --shift-off:#5fa884;
+      --shift-rest:#6b93c9;
+      --shift-day-fg:#241110;
+      --shift-night-fg:#241a08;
+      --shift-off-fg:#0d1e16;
+      --shift-rest-fg:#0e1a28;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#15161a;
+    --surface:#1c1e24;
+    --surface-muted:#20222a;
+    --border:#2d3038;
+    --text:#edeef2;
+    --text-muted:#93909f;
+    --text-faint:#585864;
+    --accent:#8db0dc;
+    --accent-soft:#28374a;
+    --sun:#e08669;
+    --sat:#7aa8d6;
+
+    --shift-day:#d97862;
+    --shift-night:#dba24f;
+    --shift-off:#5fa884;
+    --shift-rest:#6b93c9;
+    --shift-day-fg:#241110;
+    --shift-night-fg:#241a08;
+    --shift-off-fg:#0d1e16;
+    --shift-rest-fg:#0e1a28;
+    color-scheme: dark;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{ margin:0; }
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:"IBM Plex Sans KR","IBM Plex Sans",system-ui,sans-serif;
+    padding-inline:16px;
+    padding-block:16px 28px;
+    max-width:480px;
+    margin:0 auto;
+    -webkit-tap-highlight-color:transparent;
+  }
+  h1,h2{text-wrap:balance; margin:0;}
+
+  .topbar{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:14px;
+  }
+  .month-title{
+    flex:1;
+    font-family:"Sora",sans-serif;
+    font-weight:700;
+    font-size:1.35rem;
+    text-align:center;
+    letter-spacing:-0.01em;
+  }
+  .icon-btn{
+    width:38px;height:38px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:var(--surface);
+    color:var(--text);
+    font-size:1.05rem;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    flex-shrink:0;
+  }
+  .icon-btn:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:2px;
+  }
+  .icon-btn:active{ transform: translateY(1px); }
+
+  .control-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:12px;
+    flex-wrap:wrap;
+  }
+  .control-label{
+    font-size:.78rem;
+    color:var(--text-muted);
+    font-weight:600;
+    white-space:nowrap;
+  }
+  .team-select{
+    display:flex;
+    gap:4px;
+    background:var(--surface-muted);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:3px;
+  }
+  .team-select button{
+    border:none;
+    background:transparent;
+    color:var(--text-muted);
+    font-family:"IBM Plex Mono",monospace;
+    font-weight:600;
+    font-size:.82rem;
+    padding:6px 10px;
+    border-radius:7px;
+    cursor:pointer;
+  }
+  .team-select button.active{
+    background:var(--accent);
+    color:var(--surface);
+  }
+  .today-btn{
+    margin-left:auto;
+    border:1px solid var(--border);
+    background:var(--surface);
+    color:var(--text);
+    font-size:.78rem;
+    font-weight:600;
+    padding:7px 12px;
+    border-radius:9px;
+    cursor:pointer;
+  }
+
+  .legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:14px;
+    padding:10px 12px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:12px;
+  }
+  .legend-item{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:.76rem;
+    color:var(--text-muted);
+    font-weight:500;
+  }
+  .legend-item i{
+    width:10px;height:10px;
+    border-radius:3px;
+    display:inline-block;
+  }
+  .legend-item.day i{background:var(--shift-day);}
+  .legend-item.night i{background:var(--shift-night);}
+  .legend-item.off i{background:var(--shift-off);}
+  .legend-item.rest i{background:var(--shift-rest);}
+  .legend-note{
+    margin-left:auto;
+    font-size:.72rem;
+    color:var(--text-faint);
+    font-family:"IBM Plex Mono",monospace;
+  }
+
+  .calendar-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:16px;
+    overflow:hidden;
+  }
+  .weekday-row{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    border-bottom:1px solid var(--border);
+  }
+  .weekday-row span{
+    text-align:center;
+    font-size:.72rem;
+    font-weight:600;
+    color:var(--text-muted);
+    padding-block:9px;
+  }
+  .weekday-row span.sun{color:var(--sun);}
+  .weekday-row span.sat{color:var(--sat);}
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+  }
+  .cell{
+    border-right:1px solid var(--border);
+    border-bottom:1px solid var(--border);
+    padding:6px 3px 9px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+    min-height:78px;
+  }
+  .cell:nth-child(7n){ border-right:none; }
+  .cell.muted{ opacity:.4; }
+  .cell.today{ background:var(--accent-soft); }
+
+  .cell-date{
+    font-family:"IBM Plex Mono",monospace;
+    font-variant-numeric:tabular-nums;
+    font-size:.78rem;
+    font-weight:600;
+    color:var(--text);
+    align-self:flex-start;
+    padding-left:2px;
+  }
+  .cell.muted .cell-date{ color:var(--text-faint); }
+  .cell-date.sun{ color:var(--sun); }
+  .cell-date.sat{ color:var(--sat); }
+
+  .cell-shift{
+    width:100%;
+    text-align:center;
+    font-size:.68rem;
+    font-weight:700;
+    padding:3px 0;
+    border-radius:6px;
+    letter-spacing:-0.01em;
+  }
+  .shift-day{ background:var(--shift-day); color:var(--shift-day-fg); }
+  .shift-night{ background:var(--shift-night); color:var(--shift-night-fg); }
+  .shift-off{ background:var(--shift-off); color:var(--shift-off-fg); }
+  .shift-rest{ background:var(--shift-rest); color:var(--shift-rest-fg); }
+
+  .cell-code{
+    width:100%;
+    text-align:center;
+    font-family:"IBM Plex Mono",monospace;
+    font-size:.65rem;
+    font-weight:600;
+    letter-spacing:.02em;
+    color:var(--text-muted);
+    background:var(--surface-muted);
+    border-radius:5px;
+    padding:2px 0;
+  }
+  .cell.muted .cell-code{ color:var(--text-faint); }
+
+  .settings-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.4);
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    z-index:10;
+  }
+  .settings-panel{
+    width:100%;
+    max-width:480px;
+    background:var(--surface);
+    border-top-left-radius:20px;
+    border-top-right-radius:20px;
+    border:1px solid var(--border);
+    padding:20px 20px calc(20px + env(safe-area-inset-bottom, 0px));
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .settings-panel h2{
+    font-family:"Sora",sans-serif;
+    font-size:1.05rem;
+    font-weight:700;
+  }
+  .settings-desc{
+    font-size:.8rem;
+    color:var(--text-muted);
+    line-height:1.5;
+    margin:0;
+  }
+  .field{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .field span{
+    font-size:.78rem;
+    font-weight:600;
+    color:var(--text-muted);
+  }
+  .field input, .field select{
+    font-family:inherit;
+    font-size:.9rem;
+    padding:9px 10px;
+    border-radius:9px;
+    border:1px solid var(--border);
+    background:var(--surface-muted);
+    color:var(--text);
+  }
+  .settings-actions{
+    display:flex;
+    gap:8px;
+    margin-top:4px;
+  }
+  .settings-actions button{
+    flex:1;
+    padding:11px;
+    border-radius:10px;
+    font-weight:700;
+    font-size:.88rem;
+    cursor:pointer;
+    border:1px solid var(--border);
+  }
+  .btn-primary{
+    background:var(--accent);
+    color:var(--surface);
+    border-color:var(--accent);
+  }
+  .btn-secondary{
+    background:transparent;
+    color:var(--text);
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <button class="icon-btn" id="prevMonth" aria-label="이전 달">‹</button>
+  <div class="month-title" id="monthTitle">-</div>
+  <button class="icon-btn" id="nextMonth" aria-label="다음 달">›</button>
+  <button class="icon-btn" id="settingsBtn" aria-label="기준일 설정">⚙</button>
+</div>
+
+<div class="control-row">
+  <span class="control-label">내 조</span>
+  <div class="team-select" id="teamSelect">
+    <button data-team="A">A조</button>
+    <button data-team="B">B조</button>
+    <button data-team="C">C조</button>
+    <button data-team="D">D조</button>
+  </div>
+  <button class="today-btn" id="todayBtn">오늘</button>
+</div>
+
+<div class="legend">
+  <span class="legend-item day"><i></i>주간</span>
+  <span class="legend-item night"><i></i>야간</span>
+  <span class="legend-item off"><i></i>비번</span>
+  <span class="legend-item rest"><i></i>휴무</span>
+  <span class="legend-note">코드: 주간조+야간조 (예 BC)</span>
+</div>
+
+<div class="calendar-card">
+  <div class="weekday-row">
+    <span class="sun">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span class="sat">토</span>
+  </div>
+  <div class="grid" id="calendarGrid"></div>
+</div>
+
+<div class="settings-overlay" id="settingsOverlay" hidden>
+  <div class="settings-panel">
+    <h2>기준일 설정</h2>
+    <p class="settings-desc">4조 2교대는 조마다 하루씩 밀려서 "주간 → 야간 → 비번 → 휴무"가 반복돼요. 기준 날짜에 한 조가 무슨 근무였는지 입력하면 전체 달력이 자동으로 계산돼요.</p>
+    <label class="field">
+      <span>기준 날짜</span>
+      <input type="date" id="anchorDateInput">
+    </label>
+    <label class="field">
+      <span>기준 조</span>
+      <select id="anchorTeamInput">
+        <option value="A">A조</option>
+        <option value="B">B조</option>
+        <option value="C">C조</option>
+        <option value="D">D조</option>
+      </select>
+    </label>
+    <label class="field">
+      <span>그 날 기준 조의 근무</span>
+      <select id="anchorShiftInput">
+        <option value="0">주간</option>
+        <option value="1">야간</option>
+        <option value="2">비번</option>
+        <option value="3">휴무</option>
+      </select>
+    </label>
+    <div class="settings-actions">
+      <button class="btn-secondary" id="closeSettings">닫기</button>
+      <button class="btn-primary" id="applySettings">적용</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var TEAMS = ['A','B','C','D'];
+  var SHIFTS = [
+    {key:'day',   label:'주간', cls:'shift-day'},
+    {key:'night', label:'야간', cls:'shift-night'},
+    {key:'off',   label:'비번', cls:'shift-off'},
+    {key:'rest',  label:'휴무', cls:'shift-rest'}
+  ];
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+  function mod4(n){ return ((n % 4) + 4) % 4; }
+  function dateKey(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+  function sameDate(a,b){ return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
+  function parseDateInput(v){
+    var parts = v.split('-').map(Number);
+    return new Date(parts[0], parts[1]-1, parts[2]);
+  }
+  function daysBetween(a,b){
+    var ms = new Date(b.getFullYear(),b.getMonth(),b.getDate()) - new Date(a.getFullYear(),a.getMonth(),a.getDate());
+    return Math.round(ms / 86400000);
+  }
+
+  var today = new Date();
+  // 2026-09-01 기준: B조 주간, C조 야간, D조 비번, A조 휴무 (사용자 확인 값)
+  var state = {
+    myTeam: 'D',
+    anchorDate: new Date(2026, 8, 1),
+    anchorTeam: 'B',
+    anchorShiftIndex: 0,
+    viewYear: 2026,
+    viewMonth: 8
+  };
+
+  function loadState(){
+    try{
+      var raw = localStorage.getItem('shiftCalendarSettings');
+      if(!raw) return;
+      var saved = JSON.parse(raw);
+      if(saved && TEAMS.indexOf(saved.myTeam) !== -1) state.myTeam = saved.myTeam;
+      if(saved && TEAMS.indexOf(saved.anchorTeam) !== -1) state.anchorTeam = saved.anchorTeam;
+      if(saved && typeof saved.anchorDate === 'string'){
+        var d = parseDateInput(saved.anchorDate);
+        if(!isNaN(d)) state.anchorDate = d;
+      }
+      if(saved && Number.isInteger(saved.anchorShiftIndex) && saved.anchorShiftIndex>=0 && saved.anchorShiftIndex<4){
+        state.anchorShiftIndex = saved.anchorShiftIndex;
+      }
+    }catch(e){}
+  }
+  function saveState(){
+    try{
+      localStorage.setItem('shiftCalendarSettings', JSON.stringify({
+        myTeam: state.myTeam,
+        anchorDate: dateKey(state.anchorDate),
+        anchorTeam: state.anchorTeam,
+        anchorShiftIndex: state.anchorShiftIndex
+      }));
+    }catch(e){}
+  }
+
+  // 기준 조가 아닌 A조를 공통 기준으로 환산해두면 조 선택과 무관하게 항상 같은 결과가 나옴
+  function anchorPhaseForA(){
+    return mod4(state.anchorShiftIndex - TEAMS.indexOf(state.anchorTeam));
+  }
+  function shiftIndexFor(team, date){
+    var diff = daysBetween(state.anchorDate, date);
+    return mod4(anchorPhaseForA() + diff + TEAMS.indexOf(team));
+  }
+
+  var monthTitleEl = document.getElementById('monthTitle');
+  var gridEl = document.getElementById('calendarGrid');
+  var teamSelectEl = document.getElementById('teamSelect');
+
+  function renderTeamButtons(){
+    Array.prototype.forEach.call(teamSelectEl.children, function(btn){
+      btn.classList.toggle('active', btn.dataset.team === state.myTeam);
+    });
+  }
+
+  function renderCalendar(){
+    monthTitleEl.textContent = state.viewYear + '년 ' + (state.viewMonth+1) + '월';
+
+    var firstOfMonth = new Date(state.viewYear, state.viewMonth, 1);
+    var startDate = new Date(firstOfMonth);
+    startDate.setDate(startDate.getDate() - firstOfMonth.getDay());
+
+    var lastOfMonth = new Date(state.viewYear, state.viewMonth+1, 0);
+    var totalCells = Math.ceil((firstOfMonth.getDay() + lastOfMonth.getDate()) / 7) * 7;
+
+    var html = '';
+    for(var i=0;i<totalCells;i++){
+      var d = new Date(startDate);
+      d.setDate(startDate.getDate() + i);
+      var inMonth = d.getMonth() === state.viewMonth;
+      var isToday = sameDate(d, today);
+      var dow = d.getDay();
+
+      var myIdx = shiftIndexFor(state.myTeam, d);
+      var myShift = SHIFTS[myIdx];
+
+      var dayTeam = '', nightTeam = '';
+      TEAMS.forEach(function(t){
+        var idx = shiftIndexFor(t, d);
+        if(idx === 0) dayTeam = t;
+        if(idx === 1) nightTeam = t;
+      });
+      var code = dayTeam + nightTeam;
+
+      var dateCls = 'cell-date' + (dow===0?' sun':'') + (dow===6?' sat':'');
+
+      html += '<div class="cell' + (inMonth?'':' muted') + (isToday?' today':'') + '">'
+        + '<span class="'+dateCls+'">' + d.getDate() + '</span>'
+        + '<span class="cell-shift ' + myShift.cls + '">' + myShift.label + '</span>'
+        + '<span class="cell-code">' + code + '</span>'
+        + '</div>';
+    }
+    gridEl.innerHTML = html;
+  }
+
+  function renderAll(){
+    renderTeamButtons();
+    renderCalendar();
+  }
+
+  document.getElementById('prevMonth').addEventListener('click', function(){
+    state.viewMonth -= 1;
+    if(state.viewMonth < 0){ state.viewMonth = 11; state.viewYear -= 1; }
+    renderCalendar();
+  });
+  document.getElementById('nextMonth').addEventListener('click', function(){
+    state.viewMonth += 1;
+    if(state.viewMonth > 11){ state.viewMonth = 0; state.viewYear += 1; }
+    renderCalendar();
+  });
+  document.getElementById('todayBtn').addEventListener('click', function(){
+    state.viewYear = today.getFullYear();
+    state.viewMonth = today.getMonth();
+    renderCalendar();
+  });
+  teamSelectEl.addEventListener('click', function(e){
+    var btn = e.target.closest('button[data-team]');
+    if(!btn) return;
+    state.myTeam = btn.dataset.team;
+    saveState();
+    renderAll();
+  });
+
+  var overlay = document.getElementById('settingsOverlay');
+  var anchorDateInput = document.getElementById('anchorDateInput');
+  var anchorTeamInput = document.getElementById('anchorTeamInput');
+  var anchorShiftInput = document.getElementById('anchorShiftInput');
+
+  document.getElementById('settingsBtn').addEventListener('click', function(){
+    anchorDateInput.value = dateKey(state.anchorDate);
+    anchorTeamInput.value = state.anchorTeam;
+    anchorShiftInput.value = String(state.anchorShiftIndex);
+    overlay.hidden = false;
+  });
+  document.getElementById('closeSettings').addEventListener('click', function(){
+    overlay.hidden = true;
+  });
+  overlay.addEventListener('click', function(e){
+    if(e.target === overlay) overlay.hidden = true;
+  });
+  document.getElementById('applySettings').addEventListener('click', function(){
+    var v = anchorDateInput.value;
+    if(v){
+      var d = parseDateInput(v);
+      if(!isNaN(d)) state.anchorDate = d;
+    }
+    state.anchorTeam = anchorTeamInput.value;
+    state.anchorShiftIndex = parseInt(anchorShiftInput.value, 10);
+    saveState();
+    overlay.hidden = true;
+    renderAll();
+  });
+
+  loadState();
+  renderAll();
+})();
+</script>
+</body>
+</html>
