@@ -1142,12 +1142,7 @@
         continue;
       }
       var restY = groundY - p.restOffset;
-      if(y >= restY){
-        if(p.noPile){
-          p.el.remove();
-          activePetals.splice(i, 1);
-          continue;
-        }
+      if(!p.noPile && y >= restY){
         var landRot = ((p.rotSpeed * t) % 40) - 20 + (p.tilt || 0);
         p.el.style.opacity = '1';
         p.el.style.transform = 'translate(' + x.toFixed(1) + 'px,' + restY.toFixed(1) + 'px) rotate(' + landRot.toFixed(1) + 'deg) scaleX(1)';
