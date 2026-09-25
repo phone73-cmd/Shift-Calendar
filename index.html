@@ -247,6 +247,7 @@
     border:1px solid var(--border);
     border-radius:16px;
     overflow:hidden;
+    touch-action:pan-y;
   }
   .weekday-row{
     display:grid;
@@ -451,7 +452,7 @@
   <span class="legend-note">코드: 주간조+야간조 (예 BC)</span>
 </div>
 
-<div class="calendar-card">
+<div class="calendar-card" id="calendarCard">
   <div class="weekday-row">
     <span class="sun">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span class="sat">토</span>
   </div>
@@ -691,16 +692,37 @@
     applyTheme();
   }
 
-  document.getElementById('prevMonth').addEventListener('click', function(){
+  function goToPrevMonth(){
     state.viewMonth -= 1;
     if(state.viewMonth < 0){ state.viewMonth = 11; state.viewYear -= 1; }
     renderCalendar();
-  });
-  document.getElementById('nextMonth').addEventListener('click', function(){
+  }
+  function goToNextMonth(){
     state.viewMonth += 1;
     if(state.viewMonth > 11){ state.viewMonth = 0; state.viewYear += 1; }
     renderCalendar();
-  });
+  }
+  document.getElementById('prevMonth').addEventListener('click', goToPrevMonth);
+  document.getElementById('nextMonth').addEventListener('click', goToNextMonth);
+
+  var calendarCardEl = document.getElementById('calendarCard');
+  var swipeStartX = null, swipeStartY = null;
+  var SWIPE_MIN_DISTANCE = 45;
+  calendarCardEl.addEventListener('touchstart', function(e){
+    var t = e.touches[0];
+    swipeStartX = t.clientX;
+    swipeStartY = t.clientY;
+  }, {passive:true});
+  calendarCardEl.addEventListener('touchend', function(e){
+    if(swipeStartX === null) return;
+    var t = e.changedTouches[0];
+    var dx = t.clientX - swipeStartX;
+    var dy = t.clientY - swipeStartY;
+    swipeStartX = null; swipeStartY = null;
+    if(Math.abs(dx) < SWIPE_MIN_DISTANCE || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    if(dx < 0) goToNextMonth();
+    else goToPrevMonth();
+  }, {passive:true});
   document.getElementById('todayBtn').addEventListener('click', function(){
     state.viewYear = today.getFullYear();
     state.viewMonth = today.getMonth();
