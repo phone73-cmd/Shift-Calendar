@@ -788,6 +788,7 @@
     var direction = target > cur ? 1 : -1;
     state.viewYear = newYear;
     state.viewMonth = newMonth;
+    clearFallingEffect();
 
     if(prefersReducedMotion || monthAnimLock){
       renderCalendar();
@@ -966,11 +967,31 @@
     { emoji:null,   profile:'sun-burst' },
     { colors:['#f3a9c6','#fdfaf3','#e2645c'], profile:'petal' },
     { emoji:['🍂'], profile:'leaf'  },
-    { emoji:['🍁'], profile:'leaf'  },
+    { emoji:['🍂'], profile:'leaf'  },
     { emoji:['❄️'], profile:'snow'  }
   ];
   function getMonthTheme(){
-    return MONTH_THEMES[new Date().getMonth()];
+    return MONTH_THEMES[state.viewMonth];
+  }
+
+  function clearFallingEffect(){
+    if(fallSpawnTimer){
+      window.clearInterval(fallSpawnTimer);
+      fallSpawnTimer = null;
+    }
+    fallingActive = false;
+    appTitleEl.classList.remove('falling-active');
+    if(petalRafId !== null){
+      cancelAnimationFrame(petalRafId);
+      petalRafId = null;
+    }
+    activePetals.forEach(function(p){ p.el.remove(); });
+    activePetals.length = 0;
+    landedPetals.forEach(function(entry){
+      if(entry.timer) window.clearTimeout(entry.timer);
+      entry.el.remove();
+    });
+    landedPetals.length = 0;
   }
 
   function getGroundY(){
