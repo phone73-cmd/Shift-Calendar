@@ -943,13 +943,22 @@
     return window.innerHeight - 8;
   }
 
+  function fadeAndRemove(entry){
+    var idx = landedPetals.indexOf(entry);
+    if(idx !== -1) landedPetals.splice(idx, 1);
+    entry.el.style.transition = 'opacity 1.2s ease';
+    entry.el.style.opacity = '0';
+    window.setTimeout(function(){ entry.el.remove(); }, 1250);
+  }
+
   function landPetal(el){
-    landedPetals.push(el);
+    var entry = { el: el, timer: null };
+    entry.timer = window.setTimeout(function(){ fadeAndRemove(entry); }, 8000 + Math.random()*4000);
+    landedPetals.push(entry);
     if(landedPetals.length > MAX_LANDED){
-      var oldEl = landedPetals.shift();
-      oldEl.style.transition = 'opacity .6s ease';
-      oldEl.style.opacity = '0';
-      window.setTimeout(function(){ oldEl.remove(); }, 650);
+      var oldEntry = landedPetals.shift();
+      window.clearTimeout(oldEntry.timer);
+      fadeAndRemove(oldEntry);
     }
   }
 
