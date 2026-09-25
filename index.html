@@ -270,6 +270,11 @@
   .grid{
     display:grid;
     grid-template-columns:repeat(7,1fr);
+    transition:transform .16s ease, opacity .16s ease;
+    will-change:transform;
+  }
+  @media (prefers-reduced-motion: reduce){
+    .grid{ transition:none; }
   }
   .cell{
     border-right:1px solid var(--border);
@@ -697,15 +702,52 @@
     applyTheme();
   }
 
+  var prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var monthAnimLock = false;
+  var SLIDE_DISTANCE = 22;
+
+  function monthIndex(y, m){ return y * 12 + m; }
+
+  function goToMonth(newYear, newMonth){
+    var cur = monthIndex(state.viewYear, state.viewMonth);
+    var target = monthIndex(newYear, newMonth);
+    if(target === cur) return;
+    var direction = target > cur ? 1 : -1;
+    state.viewYear = newYear;
+    state.viewMonth = newMonth;
+
+    if(prefersReducedMotion || monthAnimLock){
+      renderCalendar();
+      return;
+    }
+
+    monthAnimLock = true;
+    var outX = direction > 0 ? -SLIDE_DISTANCE : SLIDE_DISTANCE;
+    var inX = -outX;
+    gridEl.style.transform = 'translateX(' + outX + 'px)';
+    gridEl.style.opacity = '0';
+    window.setTimeout(function(){
+      renderCalendar();
+      gridEl.style.transition = 'none';
+      gridEl.style.transform = 'translateX(' + inX + 'px)';
+      gridEl.style.opacity = '0';
+      void gridEl.offsetWidth;
+      gridEl.style.transition = '';
+      gridEl.style.transform = 'translateX(0)';
+      gridEl.style.opacity = '1';
+      window.setTimeout(function(){ monthAnimLock = false; }, 170);
+    }, 150);
+  }
+
   function goToPrevMonth(){
-    state.viewMonth -= 1;
-    if(state.viewMonth < 0){ state.viewMonth = 11; state.viewYear -= 1; }
-    renderCalendar();
+    var m = state.viewMonth - 1, y = state.viewYear;
+    if(m < 0){ m = 11; y -= 1; }
+    goToMonth(y, m);
   }
   function goToNextMonth(){
-    state.viewMonth += 1;
-    if(state.viewMonth > 11){ state.viewMonth = 0; state.viewYear += 1; }
-    renderCalendar();
+    var m = state.viewMonth + 1, y = state.viewYear;
+    if(m > 11){ m = 0; y += 1; }
+    goToMonth(y, m);
   }
   document.getElementById('prevMonth').addEventListener('click', goToPrevMonth);
   document.getElementById('nextMonth').addEventListener('click', goToNextMonth);
@@ -729,9 +771,7 @@
     else goToPrevMonth();
   }, {passive:true});
   document.getElementById('todayBtn').addEventListener('click', function(){
-    state.viewYear = today.getFullYear();
-    state.viewMonth = today.getMonth();
-    renderCalendar();
+    goToMonth(today.getFullYear(), today.getMonth());
   });
   teamSelectEl.addEventListener('click', function(e){
     var btn = e.target.closest('button[data-team]');
