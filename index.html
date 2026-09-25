@@ -517,7 +517,7 @@
   }
   .fx-petal.rain-streak{
     border-radius:999px;
-    background:linear-gradient(100deg, rgba(255,255,255,.95) 0%, rgba(255,255,255,.25) 28%, rgba(120,175,222,.9) 46%, rgba(120,175,222,.95) 100%);
+    background:linear-gradient(to bottom, rgba(255,255,255,.85), rgba(120,175,222,.92));
   }
   @media (prefers-reduced-motion: reduce){
     .fx-particle, .fx-petal{ display:none; }
@@ -1020,7 +1020,7 @@
   var FALL_PROFILES = {
     petal: { fallMin:30,  fallSpread:28, accelMin:3,  accelSpread:4,  swayAmpMin:10, swayAmpSpread:18, swayFreqMin:1.1, swayFreqSpread:1.5, rotMin:25, rotSpread:55, flip:true,  windMin:5, windSpread:8  },
     rain:  { fallMin:230, fallSpread:90, accelMin:15, accelSpread:20, swayAmpMin:2,  swayAmpSpread:4,  swayFreqMin:2,   swayFreqSpread:1,   rotMin:0,  rotSpread:0,  flip:false, windMin:2,  windSpread:4  },
-    'rain-diagonal': { fallMin:260, fallSpread:80, accelMin:20, accelSpread:15, swayAmpMin:0, swayAmpSpread:0, swayFreqMin:1, swayFreqSpread:0, rotMin:0, rotSpread:0, flip:true, windMin:40, windSpread:35 },
+    'rain-diagonal': { fallMin:260, fallSpread:80, accelMin:20, accelSpread:15, swayAmpMin:0, swayAmpSpread:0, swayFreqMin:1, swayFreqSpread:0, rotMin:0, rotSpread:0, flip:false, windMin:40, windSpread:35 },
     snow:  { fallMin:18,  fallSpread:20, accelMin:1,  accelSpread:2,  swayAmpMin:18, swayAmpSpread:16, swayFreqMin:0.8, swayFreqSpread:1.0, rotMin:10, rotSpread:20, flip:true,  windMin:6, windSpread:10 },
     leaf:  { fallMin:34,  fallSpread:30, accelMin:4,  accelSpread:5,  swayAmpMin:14, swayAmpSpread:20, swayFreqMin:1.3, swayFreqSpread:1.6, rotMin:40, rotSpread:80, flip:true,  windMin:6, windSpread:10 }
   };
@@ -1178,7 +1178,7 @@
       var profile = FALL_PROFILES[theme.profile];
       sessionWindSign = theme.profile === 'rain-diagonal' ? -1 : (Math.random() < 0.5 ? -1 : 1);
       sessionWindBase = profile.windMin + Math.random() * profile.windSpread;
-      sessionTilt = theme.profile === 'rain-diagonal' ? sessionWindSign * (16 + Math.random()*8) : 0;
+      sessionTilt = theme.profile === 'rain-diagonal' ? -sessionWindSign * (16 + Math.random()*8) : 0;
       spawnPetalBatch(1, theme, profile);
       fallSpawnTimer = window.setInterval(function(){ spawnPetalBatch(2, theme, profile); }, 680);
     } else if(fallSpawnTimer){
