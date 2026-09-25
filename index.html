@@ -206,6 +206,9 @@
     border-radius:9px;
     cursor:pointer;
   }
+  .today-btn.current-month{
+    color:var(--text-faint);
+  }
 
   .legend{
     display:flex;
@@ -597,6 +600,7 @@
   var monthTitleEl = document.getElementById('monthTitle');
   var gridEl = document.getElementById('calendarGrid');
   var teamSelectEl = document.getElementById('teamSelect');
+  var todayBtnEl = document.getElementById('todayBtn');
   var themeModeSelectEl = document.getElementById('themeModeSelect');
   var swatchRowEl = document.getElementById('swatchRow');
   var swatchFieldEl = document.getElementById('swatchField');
@@ -648,6 +652,7 @@
 
   function renderCalendar(){
     monthTitleEl.textContent = state.viewYear + '년 ' + (state.viewMonth+1) + '월';
+    todayBtnEl.classList.toggle('current-month', state.viewYear === today.getFullYear() && state.viewMonth === today.getMonth());
 
     var firstOfMonth = new Date(state.viewYear, state.viewMonth, 1);
     var startDate = new Date(firstOfMonth);
