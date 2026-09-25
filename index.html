@@ -721,9 +721,9 @@
   var anchorShiftInput = document.getElementById('anchorShiftInput');
 
   document.getElementById('settingsBtn').addEventListener('click', function(){
-    anchorDateInput.value = dateKey(state.anchorDate);
-    anchorTeamInput.value = state.anchorTeam;
-    anchorShiftInput.value = String(state.anchorShiftIndex);
+    anchorDateInput.value = dateKey(today);
+    anchorTeamInput.value = state.myTeam;
+    anchorShiftInput.value = String(shiftIndexFor(state.myTeam, today));
     overlay.hidden = false;
   });
   document.getElementById('closeSettings').addEventListener('click', function(){
