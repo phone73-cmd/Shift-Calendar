@@ -1004,8 +1004,8 @@
         el: el,
         start: now + Math.random()*550,
         baseX: Math.random() * Math.max(1, window.innerWidth - 24),
-        fallSpeed: 42 + Math.random()*40,
-        accel: 4 + Math.random()*6,
+        fallSpeed: 30 + Math.random()*28,
+        accel: 3 + Math.random()*4,
         wind: sessionWindSign * sessionWindBase * (0.5 + Math.random()*0.9),
         swayAmp: 10 + Math.random()*18,
         swayFreq: 1.1 + Math.random()*1.5,
@@ -1029,8 +1029,8 @@
     if(fallingActive){
       sessionWindSign = Math.random() < 0.5 ? -1 : 1;
       sessionWindBase = 5 + Math.random() * 8;
-      spawnPetalBatch(6);
-      fallSpawnTimer = window.setInterval(function(){ spawnPetalBatch(4); }, 380);
+      spawnPetalBatch(3);
+      fallSpawnTimer = window.setInterval(function(){ spawnPetalBatch(2); }, 380);
     } else if(fallSpawnTimer){
       window.clearInterval(fallSpawnTimer);
       fallSpawnTimer = null;
