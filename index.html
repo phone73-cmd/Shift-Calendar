@@ -1032,7 +1032,7 @@
     { emoji:['🌸'], profile:'petal' },
     { emoji:['🌹'], profile:'petal' },
     { emoji:['💧'], profile:'rain'  },
-    { streak:true,  profile:'rain-diagonal' },
+    { streak:true,  profile:'rain-diagonal', spawnInterval:567 },
     { emoji:null,   profile:'sun-burst' },
     { emoji:['🌸','💮','🌺'], profile:'petal' },
     { emoji:['🍂'], profile:'leaf'  },
@@ -1186,7 +1186,7 @@
       sessionWindBase = profile.windMin + Math.random() * profile.windSpread;
       sessionTilt = theme.profile === 'rain-diagonal' ? -sessionWindSign * (16 + Math.random()*8) : 0;
       spawnPetalBatch(1, theme, profile);
-      fallSpawnTimer = window.setInterval(function(){ spawnPetalBatch(2, theme, profile); }, 680);
+      fallSpawnTimer = window.setInterval(function(){ spawnPetalBatch(2, theme, profile); }, theme.spawnInterval || 680);
     } else if(fallSpawnTimer){
       window.clearInterval(fallSpawnTimer);
       fallSpawnTimer = null;
