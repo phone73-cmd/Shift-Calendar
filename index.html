@@ -126,6 +126,14 @@
     color:var(--text);
     text-align:center;
     margin-bottom:14px;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+    user-select:none;
+  }
+  .app-title:focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:4px;
+    border-radius:6px;
   }
 
   .topbar{
@@ -470,14 +478,30 @@
     0%{ transform:translate(-50%,-50%) translate(0,0) rotate(0deg) scale(.5); opacity:1; }
     100%{ transform:translate(-50%,-50%) translate(var(--dx),var(--dy)) rotate(var(--rot)) scale(1); opacity:0; }
   }
+  .fx-petal{
+    position:fixed;
+    top:0;
+    left:0;
+    animation-name:fx-petal-fall;
+    animation-timing-function:ease-in-out;
+    animation-fill-mode:forwards;
+    will-change:transform,opacity;
+  }
+  @keyframes fx-petal-fall{
+    0%{ transform:translate(var(--x), -8vh) rotate(0deg); opacity:.95; }
+    25%{ transform:translate(calc(var(--x) + var(--sway)), 20vh) rotate(90deg); }
+    50%{ transform:translate(calc(var(--x) - var(--sway)), 50vh) rotate(200deg); }
+    75%{ transform:translate(calc(var(--x) + var(--sway)), 80vh) rotate(300deg); }
+    100%{ transform:translate(var(--x), 108vh) rotate(380deg); opacity:0; }
+  }
   @media (prefers-reduced-motion: reduce){
-    .fx-particle{ display:none; }
+    .fx-particle, .fx-petal{ display:none; }
   }
 </style>
 </head>
 <body>
 
-<h1 class="app-title">교대근무 달력</h1>
+<h1 class="app-title" id="appTitle" role="button" tabindex="0" aria-label="벚꽃 효과 보기">교대근무 달력</h1>
 
 <div class="topbar">
   <button class="icon-btn" id="prevMonth" aria-label="이전 달">‹</button>
@@ -875,7 +899,7 @@
 
   var fxLayerEl = document.getElementById('fxLayer');
   var signatureEl = document.getElementById('signature');
-  var FX_EMOJIS = ['❤️','💖','💕','🌸','🌸','🌷'];
+  var FX_EMOJIS = ['❤️','💖','💕','💗','💓'];
 
   function spawnFx(x, y){
     if(prefersReducedMotion) return;
@@ -909,6 +933,35 @@
     e.preventDefault();
     var rect = signatureEl.getBoundingClientRect();
     spawnFx(rect.left + rect.width/2, rect.top + rect.height/2);
+  });
+
+  var appTitleEl = document.getElementById('appTitle');
+  function spawnPetalFall(){
+    if(prefersReducedMotion) return;
+    var count = 18;
+    for(var i=0;i<count;i++){
+      var el = document.createElement('span');
+      el.className = 'fx-petal';
+      el.textContent = '🌸';
+      var x = (Math.random()*90 + 2).toFixed(1) + 'vw';
+      var sway = (Math.random()*4 + 3).toFixed(1) + 'vw';
+      var duration = (2600 + Math.random()*1800).toFixed(0) + 'ms';
+      var delay = (Math.random()*450).toFixed(0) + 'ms';
+      var size = (0.95 + Math.random()*0.6).toFixed(2) + 'rem';
+      el.style.setProperty('--x', x);
+      el.style.setProperty('--sway', sway);
+      el.style.animationDuration = duration;
+      el.style.animationDelay = delay;
+      el.style.fontSize = size;
+      fxLayerEl.appendChild(el);
+      el.addEventListener('animationend', function(){ this.remove(); });
+    }
+  }
+  appTitleEl.addEventListener('click', spawnPetalFall);
+  appTitleEl.addEventListener('keydown', function(e){
+    if(e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    spawnPetalFall();
   });
 
   loadState();
