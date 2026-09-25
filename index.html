@@ -1038,8 +1038,8 @@
     if(fallingActive){
       sessionWindSign = Math.random() < 0.5 ? -1 : 1;
       sessionWindBase = 5 + Math.random() * 8;
-      spawnPetalBatch(2);
-      fallSpawnTimer = window.setInterval(function(){ spawnPetalBatch(2); }, 475);
+      spawnPetalBatch(1);
+      fallSpawnTimer = window.setInterval(function(){ spawnPetalBatch(2); }, 680);
     } else if(fallSpawnTimer){
       window.clearInterval(fallSpawnTimer);
       fallSpawnTimer = null;
