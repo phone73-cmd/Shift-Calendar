@@ -482,17 +482,8 @@
     position:fixed;
     top:0;
     left:0;
-    animation-name:fx-petal-fall;
-    animation-timing-function:ease-in-out;
-    animation-fill-mode:forwards;
+    pointer-events:none;
     will-change:transform,opacity;
-  }
-  @keyframes fx-petal-fall{
-    0%{ transform:translate(var(--x), -8vh) rotate(0deg); opacity:.95; }
-    25%{ transform:translate(calc(var(--x) + var(--sway)), 20vh) rotate(90deg); }
-    50%{ transform:translate(calc(var(--x) - var(--sway)), 50vh) rotate(200deg); }
-    75%{ transform:translate(calc(var(--x) + var(--sway)), 80vh) rotate(300deg); }
-    100%{ transform:translate(var(--x), 108vh) rotate(380deg); opacity:0; }
   }
   @media (prefers-reduced-motion: reduce){
     .fx-particle, .fx-petal{ display:none; }
@@ -936,25 +927,72 @@
   });
 
   var appTitleEl = document.getElementById('appTitle');
+  var activePetals = [];
+  var petalRafId = null;
+
+  function petalLoop(now){
+    var vh = window.innerHeight;
+    for(var i = activePetals.length - 1; i >= 0; i--){
+      var p = activePetals[i];
+      var t = (now - p.start) / 1000;
+      if(t < 0) continue;
+      if(t > p.maxLife){
+        p.el.remove();
+        activePetals.splice(i, 1);
+        continue;
+      }
+      var y = -30 + p.fallSpeed * t + p.accel * t * t;
+      var x = p.baseX + p.wind * t + p.swayAmp * Math.sin(p.swayFreq * t + p.swayPhase);
+      var rot = p.rotSpeed * t;
+      var flip = Math.cos(p.flipFreq * t + p.flipPhase);
+      var opacity = t < 0.3 ? t / 0.3 : 1;
+      if(y > vh - 70) opacity = Math.min(opacity, Math.max(0, 1 - (y - (vh - 70)) / 90));
+      p.el.style.opacity = opacity.toFixed(2);
+      p.el.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) rotate(' + rot.toFixed(1) + 'deg) scaleX(' + flip.toFixed(2) + ')';
+      if(y > vh + 40){
+        p.el.remove();
+        activePetals.splice(i, 1);
+      }
+    }
+    if(activePetals.length > 0){
+      petalRafId = requestAnimationFrame(petalLoop);
+    } else {
+      petalRafId = null;
+    }
+  }
+
   function spawnPetalFall(){
     if(prefersReducedMotion) return;
-    var count = 18;
+    var count = 16;
+    var windSign = Math.random() < 0.5 ? -1 : 1;
+    var windBase = 14 + Math.random() * 22;
+    var now = performance.now();
     for(var i=0;i<count;i++){
       var el = document.createElement('span');
       el.className = 'fx-petal';
       el.textContent = '🌸';
-      var x = (Math.random()*90 + 2).toFixed(1) + 'vw';
-      var sway = (Math.random()*4 + 3).toFixed(1) + 'vw';
-      var duration = (2600 + Math.random()*1800).toFixed(0) + 'ms';
-      var delay = (Math.random()*450).toFixed(0) + 'ms';
-      var size = (0.95 + Math.random()*0.6).toFixed(2) + 'rem';
-      el.style.setProperty('--x', x);
-      el.style.setProperty('--sway', sway);
-      el.style.animationDuration = duration;
-      el.style.animationDelay = delay;
-      el.style.fontSize = size;
+      el.style.fontSize = (0.9 + Math.random()*0.6).toFixed(2) + 'rem';
+      el.style.opacity = '0';
+      el.style.transform = 'translate(-9999px,-9999px)';
       fxLayerEl.appendChild(el);
-      el.addEventListener('animationend', function(){ this.remove(); });
+      activePetals.push({
+        el: el,
+        start: now + Math.random()*550,
+        baseX: Math.random() * Math.max(1, window.innerWidth - 24),
+        fallSpeed: 42 + Math.random()*40,
+        accel: 4 + Math.random()*6,
+        wind: windSign * windBase * (0.5 + Math.random()*0.9),
+        swayAmp: 10 + Math.random()*18,
+        swayFreq: 1.1 + Math.random()*1.5,
+        swayPhase: Math.random()*Math.PI*2,
+        rotSpeed: (Math.random()<0.5?-1:1) * (25 + Math.random()*55),
+        flipFreq: 1.8 + Math.random()*2,
+        flipPhase: Math.random()*Math.PI*2,
+        maxLife: 6.5
+      });
+    }
+    if(petalRafId === null){
+      petalRafId = requestAnimationFrame(petalLoop);
     }
   }
   appTitleEl.addEventListener('click', spawnPetalFall);
