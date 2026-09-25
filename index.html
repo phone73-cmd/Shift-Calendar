@@ -439,9 +439,39 @@
     line-height:1;
     color:var(--text-muted);
     opacity:.7;
-    pointer-events:none;
+    cursor:pointer;
     user-select:none;
+    -webkit-tap-highlight-color:transparent;
     z-index:5;
+  }
+  .signature:focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:3px;
+    border-radius:4px;
+  }
+
+  #fxLayer{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    overflow:hidden;
+    z-index:6;
+  }
+  .fx-particle{
+    position:absolute;
+    font-size:1.15rem;
+    transform:translate(-50%,-50%);
+    animation-name:fx-burst;
+    animation-timing-function:cubic-bezier(.17,.7,.4,1);
+    animation-fill-mode:forwards;
+    will-change:transform,opacity;
+  }
+  @keyframes fx-burst{
+    0%{ transform:translate(-50%,-50%) translate(0,0) rotate(0deg) scale(.5); opacity:1; }
+    100%{ transform:translate(-50%,-50%) translate(var(--dx),var(--dy)) rotate(var(--rot)) scale(1); opacity:0; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .fx-particle{ display:none; }
   }
 </style>
 </head>
@@ -840,11 +870,50 @@
     renderAll();
   });
 
+  var fxLayerEl = document.getElementById('fxLayer');
+  var signatureEl = document.getElementById('signature');
+  var FX_EMOJIS = ['❤️','💖','💕','🌸','🌸','🌷'];
+
+  function spawnFx(x, y){
+    if(prefersReducedMotion) return;
+    var count = 14;
+    for(var i=0;i<count;i++){
+      var el = document.createElement('span');
+      el.className = 'fx-particle';
+      el.textContent = FX_EMOJIS[Math.floor(Math.random()*FX_EMOJIS.length)];
+      var angle = Math.random() * Math.PI * 2;
+      var distance = 55 + Math.random()*95;
+      var dx = Math.cos(angle) * distance;
+      var dy = Math.sin(angle) * distance - 50;
+      var rot = Math.round(Math.random()*320 - 160);
+      var duration = 700 + Math.random()*500;
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      el.style.setProperty('--dx', dx.toFixed(0) + 'px');
+      el.style.setProperty('--dy', dy.toFixed(0) + 'px');
+      el.style.setProperty('--rot', rot + 'deg');
+      el.style.animationDuration = duration.toFixed(0) + 'ms';
+      fxLayerEl.appendChild(el);
+      el.addEventListener('animationend', function(){ this.remove(); });
+    }
+  }
+
+  signatureEl.addEventListener('click', function(e){
+    spawnFx(e.clientX, e.clientY);
+  });
+  signatureEl.addEventListener('keydown', function(e){
+    if(e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    var rect = signatureEl.getBoundingClientRect();
+    spawnFx(rect.left + rect.width/2, rect.top + rect.height/2);
+  });
+
   loadState();
   renderAll();
 })();
 </script>
-<div class="signature">Design by JIPAPA</div>
+<div id="fxLayer" aria-hidden="true"></div>
+<div class="signature" id="signature" role="button" tabindex="0" aria-label="깜짝 효과 보기">Design by JIPAPA</div>
 
 </body>
 </html>
