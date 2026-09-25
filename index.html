@@ -940,11 +940,7 @@
   var MAX_LANDED = 40;
 
   function getGroundY(){
-    var vh = window.innerHeight;
-    var rect = calendarCardEl.getBoundingClientRect();
-    var belowCard = rect.bottom + 10;
-    var viewportLimit = vh - 34;
-    return Math.max(60, Math.min(belowCard, viewportLimit));
+    return window.innerHeight - 8;
   }
 
   function landPetal(el){
@@ -970,8 +966,9 @@
       }
       var y = -30 + p.fallSpeed * t + p.accel * t * t;
       var restY = groundY - p.restOffset;
+      var maxX = window.innerWidth - 24;
       if(y >= restY){
-        var landX = p.baseX + p.wind * t + p.swayAmp * Math.sin(p.swayFreq * t + p.swayPhase);
+        var landX = Math.max(4, Math.min(maxX, p.baseX + p.wind * t + p.swayAmp * Math.sin(p.swayFreq * t + p.swayPhase)));
         var landRot = ((p.rotSpeed * t) % 40) - 20;
         p.el.style.opacity = '1';
         p.el.style.transform = 'translate(' + landX.toFixed(1) + 'px,' + restY.toFixed(1) + 'px) rotate(' + landRot.toFixed(1) + 'deg) scaleX(1)';
@@ -979,7 +976,7 @@
         landPetal(p.el);
         continue;
       }
-      var x = p.baseX + p.wind * t + p.swayAmp * Math.sin(p.swayFreq * t + p.swayPhase);
+      var x = Math.max(4, Math.min(maxX, p.baseX + p.wind * t + p.swayAmp * Math.sin(p.swayFreq * t + p.swayPhase)));
       var rot = p.rotSpeed * t;
       var flip = Math.cos(p.flipFreq * t + p.flipPhase);
       var opacity = t < 0.3 ? t / 0.3 : 1;
@@ -1031,7 +1028,7 @@
     appTitleEl.classList.toggle('falling-active', fallingActive);
     if(fallingActive){
       sessionWindSign = Math.random() < 0.5 ? -1 : 1;
-      sessionWindBase = 14 + Math.random() * 22;
+      sessionWindBase = 5 + Math.random() * 8;
       spawnPetalBatch(6);
       fallSpawnTimer = window.setInterval(function(){ spawnPetalBatch(4); }, 380);
     } else if(fallSpawnTimer){
