@@ -1031,7 +1031,7 @@
     { emoji:['🌼'], profile:'petal' },
     { emoji:['🌸'], profile:'petal' },
     { emoji:['🌹'], profile:'petal' },
-    { emoji:['💧'], profile:'rain'  },
+    { emoji:['💧'], profile:'rain', sizeScale:0.5 },
     { streak:true,  profile:'rain-diagonal', spawnInterval:567 },
     { emoji:null,   profile:'sun-burst' },
     { emoji:['🌸','💮','🌺'], profile:'petal' },
@@ -1145,7 +1145,7 @@
         el.style.background = theme.colors[Math.floor(Math.random()*theme.colors.length)];
       } else {
         el.textContent = theme.emoji[Math.floor(Math.random()*theme.emoji.length)];
-        el.style.fontSize = (0.9 + Math.random()*0.6).toFixed(2) + 'rem';
+        el.style.fontSize = ((0.9 + Math.random()*0.6) * (theme.sizeScale || 1)).toFixed(2) + 'rem';
       }
       el.style.opacity = '0';
       el.style.transform = 'translate(-9999px,-9999px)';
