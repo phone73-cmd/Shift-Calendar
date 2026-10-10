@@ -669,7 +669,7 @@
   </div>
 </div>
 
-<span class="version-badge" aria-hidden="true">v1.0.2</span>
+<span class="version-badge" aria-hidden="true">v1.0.3</span>
 
 <div class="ptr-indicator" id="ptrIndicator" aria-hidden="true"><span class="ptr-icon">↓</span></div>
 
@@ -1312,11 +1312,7 @@
       ptrIndicator.classList.add('loading');
       ptrIndicator.classList.remove('ready');
       ptrIndicator.style.transform = 'translate(-50%, 14px)';
-      window.setTimeout(function(){
-        goToMonth(today.getFullYear(), today.getMonth());
-        ptrIndicator.classList.remove('loading', 'visible');
-        ptrIndicator.style.transform = '';
-      }, 450);
+      window.setTimeout(function(){ window.location.reload(); }, 350);
     } else {
       ptrIndicator.classList.remove('visible');
       ptrIndicator.style.transform = '';
