@@ -615,8 +615,6 @@
   <span class="legend-note">코드: 주간조+야간조 (예 BC)</span>
 </div>
 
-<div id="debugInfo" style="font-size:10px;line-height:1.5;color:var(--text-faint);text-align:center;margin-bottom:8px;word-break:break-all;"></div>
-
 <div class="calendar-card" id="calendarCard">
   <div class="weekday-row">
     <span class="sun">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span class="sat">토</span>
@@ -674,7 +672,7 @@
   </div>
 </div>
 
-<span class="version-badge" aria-hidden="true">v1.0.8</span>
+<span class="version-badge" aria-hidden="true">v1.0.9</span>
 
 <div class="ptr-indicator" id="ptrIndicator" aria-hidden="true"><span class="ptr-icon">↓</span></div>
 
@@ -859,27 +857,6 @@
         + '</div>';
     }
     gridEl.innerHTML = html;
-    updateDebugInfo();
-  }
-
-  function updateDebugInfo(){
-    var el = document.getElementById('debugInfo');
-    if(!el) return;
-    var todayCells = document.querySelectorAll('.cell.today');
-    var normalCell = document.querySelector('.cell:not(.today):not(.muted)');
-    var supportsColorMix = (window.CSS && CSS.supports) ? CSS.supports('background', 'color-mix(in srgb, red 50%, white 50%)') : false;
-    var todayBg = todayCells[0] ? getComputedStyle(todayCells[0]).backgroundColor : '(없음)';
-    var normalBg = normalCell ? getComputedStyle(normalCell).backgroundColor : '(없음)';
-    el.textContent = '진단: today=' + dateKey(today) +
-      ' 보는달=' + state.viewYear + '-' + (state.viewMonth+1) +
-      ' todayCell개수=' + todayCells.length +
-      ' colorMix지원=' + supportsColorMix +
-      ' todayBg=' + todayBg +
-      ' normalBg=' + normalBg +
-      ' data-app-theme=' + document.documentElement.getAttribute('data-app-theme') +
-      ' themeMode=' + state.themeMode +
-      ' swatch=' + state.swatch +
-      ' OS다크선호=' + (darkModeQuery && darkModeQuery.matches);
   }
 
   function renderAll(){
