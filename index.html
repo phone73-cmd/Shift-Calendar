@@ -379,7 +379,7 @@
   }
   .cell:nth-child(7n){ border-right:none; }
   .cell.muted{ opacity:.4; }
-  .cell.today{ background:var(--accent-soft); }
+  .cell.today{ background:var(--accent-soft); box-shadow:inset 0 0 0 1.5px var(--accent); }
 
   .cell-date{
     font-family:"IBM Plex Mono",monospace;
@@ -669,7 +669,7 @@
   </div>
 </div>
 
-<span class="version-badge" aria-hidden="true">v1.0.0</span>
+<span class="version-badge" aria-hidden="true">v1.0.1</span>
 
 <div class="ptr-indicator" id="ptrIndicator" aria-hidden="true"><span class="ptr-icon">↓</span></div>
 
@@ -716,8 +716,8 @@
     anchorDate: new Date(2026, 8, 1),
     anchorTeam: 'B',
     anchorShiftIndex: 0,
-    viewYear: 2026,
-    viewMonth: 8,
+    viewYear: today.getFullYear(),
+    viewMonth: today.getMonth(),
     themeMode: 'light',
     swatch: 'lavender'
   };
