@@ -1294,7 +1294,11 @@
       ptrIndicator.classList.add('loading');
       ptrIndicator.classList.remove('ready');
       ptrIndicator.style.transform = 'translate(-50%, 14px)';
-      window.setTimeout(function(){ window.location.reload(); }, 350);
+      window.setTimeout(function(){
+        goToMonth(today.getFullYear(), today.getMonth());
+        ptrIndicator.classList.remove('loading', 'visible');
+        ptrIndicator.style.transform = '';
+      }, 450);
     } else {
       ptrIndicator.classList.remove('visible');
       ptrIndicator.style.transform = '';
