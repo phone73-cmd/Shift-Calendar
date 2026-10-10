@@ -674,7 +674,7 @@
   </div>
 </div>
 
-<span class="version-badge" aria-hidden="true">v1.0.6</span>
+<span class="version-badge" aria-hidden="true">v1.0.7</span>
 
 <div class="ptr-indicator" id="ptrIndicator" aria-hidden="true"><span class="ptr-icon">↓</span></div>
 
@@ -875,7 +875,11 @@
       ' todayCell개수=' + todayCells.length +
       ' colorMix지원=' + supportsColorMix +
       ' todayBg=' + todayBg +
-      ' normalBg=' + normalBg;
+      ' normalBg=' + normalBg +
+      ' data-app-theme=' + document.documentElement.getAttribute('data-app-theme') +
+      ' themeMode=' + state.themeMode +
+      ' swatch=' + state.swatch +
+      ' OS다크선호=' + (darkModeQuery && darkModeQuery.matches);
   }
 
   function renderAll(){
