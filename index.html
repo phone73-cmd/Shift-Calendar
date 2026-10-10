@@ -119,7 +119,7 @@
     color:var(--text);
     font-family:"IBM Plex Sans KR","IBM Plex Sans",system-ui,sans-serif;
     padding-inline:16px;
-    padding-block:16px 28px;
+    padding-block:calc(26px + env(safe-area-inset-top, 0px)) calc(28px + env(safe-area-inset-bottom, 0px));
     max-width:480px;
     margin:0 auto;
     -webkit-tap-highlight-color:transparent;
