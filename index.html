@@ -379,7 +379,10 @@
   }
   .cell:nth-child(7n){ border-right:none; }
   .cell.muted{ opacity:.4; }
-  .cell.today{ background:color-mix(in srgb, var(--surface) 55%, white 45%); }
+  .cell.today{
+    background:var(--accent-soft);
+    background:color-mix(in srgb, var(--surface) 55%, white 45%);
+  }
 
   .cell-date{
     font-family:"IBM Plex Mono",monospace;
@@ -669,7 +672,7 @@
   </div>
 </div>
 
-<span class="version-badge" aria-hidden="true">v1.0.3</span>
+<span class="version-badge" aria-hidden="true">v1.0.4</span>
 
 <div class="ptr-indicator" id="ptrIndicator" aria-hidden="true"><span class="ptr-icon">↓</span></div>
 
